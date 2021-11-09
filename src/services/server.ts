@@ -1,5 +1,6 @@
 import express from 'express';
 import session from 'express-session';
+import transporter from './mail';
 
 const app = express();
 
@@ -16,10 +17,16 @@ app.get('/', (req, res) => {
   }
 });
 
-app.post('/login', (req, res) => {
-  const username = req.body.username;
+app.post('/login', async (req, res) => {
+  const email = req.body.email;
   const password = req.body.password;
-  res.json({ msg: `Hola ${username}` });
+  const info = await transporter.sendMail({
+    from: `${process.env.ETHERAL_USERNAME}`,
+    to: req.body.email,
+    subject: `Conexión al servicio de productos experimental`,
+    text: `Si fuiste vos quien se conecto`,
+  });
+  res.json({ msg: `Hola ${email} aca te mandamos algo ${info.messageId}` });
 });
 
 app.get('/otras', (req, res) => {

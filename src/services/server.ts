@@ -1,6 +1,7 @@
 import express from 'express';
 import session from 'express-session';
-import transporter from './mail';
+import notificationMail from './mail';
+import sendSMS from './sms';
 
 const app = express();
 
@@ -18,15 +19,11 @@ app.get('/', (req, res) => {
 });
 
 app.post('/login', async (req, res) => {
-  const email = req.body.email;
-  const password = req.body.password;
-  const info = await transporter.sendMail({
-    from: `${process.env.ETHERAL_USERNAME}`,
-    to: req.body.email,
-    subject: `Conexión al servicio de productos experimental`,
-    text: `Si fuiste vos quien se conecto`,
-  });
-  res.json({ msg: `Hola ${email} aca te mandamos algo ${info.messageId}` });
+  // Login con email, password y phonenumber
+  const resultado = await notificationMail(req.body.email);
+  console.log('Este es el que sale undefined', resultado);
+  sendSMS(req.body.phonenumber, 'Hey Bienvenido');
+  res.json(resultado);
 });
 
 app.get('/otras', (req, res) => {

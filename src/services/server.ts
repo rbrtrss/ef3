@@ -2,6 +2,10 @@ import express from 'express';
 import session from 'express-session';
 import notificationMail from './mail';
 import sendSMS from './sms';
+import {
+  validateLogin,
+  validateSignup,
+} from '../validations/usuarios.validations';
 
 const app = express();
 
@@ -18,12 +22,16 @@ app.get('/', (req, res) => {
   }
 });
 
-app.post('/login', async (req, res) => {
+app.post('/login', validateLogin, function (req, res) {
   // Login con email, password y phonenumber
-  const resultado = await notificationMail(req.body.email);
-  console.log('Este es el que sale undefined', resultado);
-  sendSMS(req.body.phonenumber, 'Hey Bienvenido');
-  res.json(resultado);
+  // const resultado = await notificationMail(req.body.email);
+  // console.log('Este es el que sale undefined', resultado);
+  // sendSMS(req.body.phonenumber, 'Hey Bienvenido');
+  res.json({ ...req.body });
+});
+
+app.post('/signup', validateSignup, function (req, res) {
+  res.json({ ...req.body });
 });
 
 app.get('/otras', (req, res) => {
